@@ -8,10 +8,10 @@ const GameBoard = () => {
     const height = 500;
 
     const BALL_SIZE = 7;
-    let ballPosition = {x: 20, y: 30};
+    let ballPosition = useRef({x: 20, y: 30});
     
-    let xSpeed = 4;
-    let ySpeed = 2;
+    let xSpeed = useRef(4);
+    let ySpeed = useRef(2);
 
     const fillCanvas = (ctx) => {
         ctx.fillStyle = 'black';
@@ -20,28 +20,29 @@ const GameBoard = () => {
 
     const drawBall = (ctx) => {
         ctx.fillStyle = "white";
-        ctx.fillRect(ballPosition.x, ballPosition.y, BALL_SIZE, BALL_SIZE);
+        ctx.fillRect(ballPosition.current.x, ballPosition.current.y, BALL_SIZE, BALL_SIZE);
     };
 
     const updateCanvas = () => {
-        ballPosition.x += xSpeed;
-        ballPosition.y += ySpeed;
+        ballPosition.current.x += xSpeed.current;
+        ballPosition.current.y += ySpeed.current;
+
     };
 
     const checkCollision = () => {
         let ball = {
-            left: ballPosition.x,
-            right: ballPosition.x + BALL_SIZE,
-            top: ballPosition.y,
-            bottom: ballPosition.y + BALL_SIZE,
+            left: ballPosition.current.x,
+            right: ballPosition.current.x + BALL_SIZE,
+            top: ballPosition.current.y,
+            bottom: ballPosition.current.y + BALL_SIZE,
         };
 
         if (ball.left < 0 || ball.right > width) {
-            xSpeed = -xSpeed;
+            xSpeed.current = -xSpeed.current;
         }
 
         if (ball.top < 0 || ball.bottom > height) {
-            ySpeed = -ySpeed;
+            ySpeed.current = -ySpeed.current;
         }
     }
 
@@ -55,7 +56,7 @@ const GameBoard = () => {
         updateCanvas();
         checkCollision();
 
-        setTimeout( gameLoop, 30);
+        requestAnimationFrame(gameLoop);
     };
 
     useEffect(() => {
