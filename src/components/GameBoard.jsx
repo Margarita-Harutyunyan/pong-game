@@ -13,6 +13,13 @@ const GameBoard = () => {
     let xSpeed = useRef(4);
     let ySpeed = useRef(2);
 
+    const PADDLE_WIDTH = 7;
+    const PADDLE_HEIGHT = 28;
+    const PADDLE_OFFSET = 10;
+
+    let leftPaddleTop = 10;
+    let rightPaddleTop = 30;
+
     const fillCanvas = (ctx) => {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, width, height);
@@ -22,6 +29,16 @@ const GameBoard = () => {
         ctx.fillStyle = "white";
         ctx.fillRect(ballPosition.current.x, ballPosition.current.y, BALL_SIZE, BALL_SIZE);
     };
+
+    const drawPaddles = (ctx) => {
+        ctx.fillStyle = "white";
+
+        // left paddle
+        ctx.fillRect(PADDLE_OFFSET, leftPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+        // right paddle
+        ctx.fillRect(width - PADDLE_OFFSET - PADDLE_WIDTH, rightPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
+    }
 
     const updateCanvas = () => {
         ballPosition.current.x += xSpeed.current;
@@ -44,6 +61,18 @@ const GameBoard = () => {
         if (ball.top < 0 || ball.bottom > height) {
             ySpeed.current = -ySpeed.current;
         }
+    };
+
+    const handleMouseMove = (e) => {
+        const canvas = canvasRef.current;
+        let position = e.clientY - canvas.getBoundingClientRect().top;
+        if (position < 0) {
+            position = 0;
+        }
+        else if (position > height - PADDLE_HEIGHT) {
+            position = height - PADDLE_HEIGHT;
+        }
+        rightPaddleTop = position;
     }
 
     const gameLoop = () => {
@@ -53,6 +82,7 @@ const GameBoard = () => {
 
         fillCanvas(ctx);
         drawBall(ctx);
+        drawPaddles(ctx);
         updateCanvas();
         checkCollision();
 
@@ -61,6 +91,11 @@ const GameBoard = () => {
 
     useEffect(() => {
         gameLoop();
+        document.addEventListener('mousemove', handleMouseMove);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+        };
     }, []);
 
   return (
