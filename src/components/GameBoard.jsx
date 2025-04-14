@@ -14,7 +14,7 @@ const GameBoard = () => {
     let ySpeed = useRef(2);
 
     const PADDLE_WIDTH = 7;
-    const PADDLE_HEIGHT = 28;
+    const PADDLE_HEIGHT = 50;
     const PADDLE_OFFSET = 10;
 
     let leftPaddleTop = 10;
@@ -46,6 +46,23 @@ const GameBoard = () => {
 
     };
 
+    const checkPaddleCollision = (ball, paddle) => {
+        return (
+            ball.left < paddle.right &&
+            ball.right > paddle.left &&
+            ball.top < paddle.bottom &&
+            ball.bottom > paddle.top
+        );
+    };
+
+    const adjustAngle = (distanceFromTop, distanceFromBottom) => {
+        if (distanceFromTop < 0) {
+            ySpeed.current -= 0.5;
+        } else if (distanceFromBottom < 0) {
+            ySpeed.current += 0.5;
+        }
+    };
+
     const checkCollision = () => {
         let ball = {
             left: ballPosition.current.x,
@@ -53,6 +70,34 @@ const GameBoard = () => {
             top: ballPosition.current.y,
             bottom: ballPosition.current.y + BALL_SIZE,
         };
+
+        let leftPaddle = {
+            left: PADDLE_OFFSET,
+            right: PADDLE_OFFSET + PADDLE_WIDTH,
+            top: leftPaddleTop,
+            bottom: leftPaddleTop + PADDLE_HEIGHT,
+        };
+
+        let rightPaddle = {
+            left: width - (PADDLE_WIDTH + PADDLE_OFFSET),
+            right: width - PADDLE_OFFSET,
+            top: rightPaddleTop,
+            bottom: rightPaddleTop + PADDLE_HEIGHT,
+        };
+
+        if (checkPaddleCollision(ball, leftPaddle)) {
+            let distanceFromTop = ball.top - leftPaddle.top;
+            let distanceFromBottom = leftPaddle.bottom - ball.bottom;
+            adjustAngle(distanceFromTop, distanceFromBottom);
+            xSpeed.current = Math.abs(xSpeed.current);
+        }
+
+        if (checkPaddleCollision(ball, rightPaddle)) {
+            let distanceFromTop = ball.top - rightPaddle.top;
+            let distanceFromBottom = rightPaddle.bottom - ball.bottom;
+            adjustAngle(distanceFromTop, distanceFromBottom);
+            xSpeed.current = -Math.abs(xSpeed.current);
+        }
 
         if (ball.left < 0 || ball.right > width) {
             xSpeed.current = -xSpeed.current;
