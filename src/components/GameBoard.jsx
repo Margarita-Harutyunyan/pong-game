@@ -22,6 +22,9 @@ const GameBoard = () => {
 
     let leftScore = 0;
     let rightScore = 0;
+    let gameOver = false;
+
+    const MAX_COMPUTER_SPEED = 2;
 
     const initBall = () => {
         ballPosition.current = {x: 20, y: 30};
@@ -47,7 +50,7 @@ const GameBoard = () => {
 
         // right paddle
         ctx.fillRect(width - PADDLE_OFFSET - PADDLE_WIDTH, rightPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
-    }
+    };
 
     const drawScores = (ctx) => {
         ctx.font = "42px monispace";
@@ -55,12 +58,30 @@ const GameBoard = () => {
         ctx.fillText(leftScore.toString(), 66, 80);
         ctx.textAlign = "right";
         ctx.fillText(rightScore.toString(), width -66, 80);
-    }
+    };
+
+    const followBall = () => {
+        let ball = {
+            top: ballPosition.current.y,
+            bottom: ballPosition.current.y + BALL_SIZE,
+        };
+
+        let leftPaddle = {
+            top: leftPaddleTop,
+            bottom: leftPaddleTop + PADDLE_HEIGHT,
+        };
+
+        if (ball.top < leftPaddle.top) {
+            leftPaddleTop -= MAX_COMPUTER_SPEED;
+        } else if (ball.bottom < leftPaddle.bottom) {
+            leftPaddleTop += MAX_COMPUTER_SPEED;
+        }
+    };
 
     const updateCanvas = () => {
         ballPosition.current.x += xSpeed.current;
         ballPosition.current.y += ySpeed.current;
-
+        followBall();
     };
 
     const checkPaddleCollision = (ball, paddle) => {
@@ -124,6 +145,10 @@ const GameBoard = () => {
             initBall();
         }
 
+        if (leftScore > 9 || rightScore > 9) {
+            gameOver = true;
+        }
+
         if (ball.top < 0 || ball.bottom > height) {
             ySpeed.current = -ySpeed.current;
         }
@@ -139,6 +164,13 @@ const GameBoard = () => {
             position = height - PADDLE_HEIGHT;
         }
         rightPaddleTop = position;
+    };
+
+    const drawGameOver = (ctx) => {
+        ctx.fillStyle = "white";
+        ctx.font = "42px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", width/2, height/2);
     }
 
     const gameLoop = () => {
@@ -153,7 +185,15 @@ const GameBoard = () => {
         updateCanvas();
         checkCollision();
 
-        requestAnimationFrame(gameLoop);
+        if (gameOver) {
+            fillCanvas(ctx);
+            drawBall(ctx);
+            drawPaddles(ctx);
+            drawScores(ctx);
+            drawGameOver(ctx); 
+        } else {
+            requestAnimationFrame(gameLoop);
+        }
     };
 
     useEffect(() => {
