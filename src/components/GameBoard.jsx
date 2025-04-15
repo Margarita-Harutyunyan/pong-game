@@ -53,7 +53,7 @@ const GameBoard = () => {
     };
 
     const drawScores = (ctx) => {
-        ctx.font = "42px monispace";
+        ctx.font = "42px monospace";
         ctx.textAlign = "left";
         ctx.fillText(leftScore.toString(), 66, 80);
         ctx.textAlign = "right";
