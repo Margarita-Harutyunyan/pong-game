@@ -8,10 +8,10 @@ const GameBoard = () => {
     const height = 500;
 
     const BALL_SIZE = 7;
-    let ballPosition = useRef({x: 20, y: 30});
+    let ballPosition = useRef({x: 0, y: 0});
     
-    let xSpeed = useRef(4);
-    let ySpeed = useRef(2);
+    let xSpeed = useRef(0);
+    let ySpeed = useRef(0);
 
     const PADDLE_WIDTH = 7;
     const PADDLE_HEIGHT = 50;
@@ -19,6 +19,15 @@ const GameBoard = () => {
 
     let leftPaddleTop = 10;
     let rightPaddleTop = 30;
+
+    let leftScore = 0;
+    let rightScore = 0;
+
+    const initBall = () => {
+        ballPosition.current = {x: 20, y: 30};
+        xSpeed.current = 4;
+        ySpeed.current = 2;
+    };
 
     const fillCanvas = (ctx) => {
         ctx.fillStyle = 'black';
@@ -38,6 +47,14 @@ const GameBoard = () => {
 
         // right paddle
         ctx.fillRect(width - PADDLE_OFFSET - PADDLE_WIDTH, rightPaddleTop, PADDLE_WIDTH, PADDLE_HEIGHT);
+    }
+
+    const drawScores = (ctx) => {
+        ctx.font = "42px monispace";
+        ctx.textAlign = "left";
+        ctx.fillText(leftScore.toString(), 66, 80);
+        ctx.textAlign = "right";
+        ctx.fillText(rightScore.toString(), width -66, 80);
     }
 
     const updateCanvas = () => {
@@ -99,8 +116,12 @@ const GameBoard = () => {
             xSpeed.current = -Math.abs(xSpeed.current);
         }
 
-        if (ball.left < 0 || ball.right > width) {
-            xSpeed.current = -xSpeed.current;
+        if (ball.left < 0) {
+            rightScore++;
+            initBall();
+        } else if (ball.right > width) {
+            leftScore++;
+            initBall();
         }
 
         if (ball.top < 0 || ball.bottom > height) {
@@ -128,6 +149,7 @@ const GameBoard = () => {
         fillCanvas(ctx);
         drawBall(ctx);
         drawPaddles(ctx);
+        drawScores(ctx);
         updateCanvas();
         checkCollision();
 
@@ -135,6 +157,7 @@ const GameBoard = () => {
     };
 
     useEffect(() => {
+        initBall();
         gameLoop();
         document.addEventListener('mousemove', handleMouseMove);
 
