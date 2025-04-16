@@ -1,0 +1,10 @@
+export const CONFIG = {
+    WIDTH: 500,
+    HEIGHT: 500,
+    BALL_SIZE: 7,
+    PADDLE_WIDTH: 7,
+    PADDLE_HEIGHT: 50,
+    PADDLE_OFFSET: 10,
+    MAX_COMPUTER_SPEED: 2,
+};
+  
