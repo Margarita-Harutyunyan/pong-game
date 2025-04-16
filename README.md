@@ -32,6 +32,8 @@ npm run dev
 
 The game will be available at http://localhost:5173
 
+---
+
 ## ✨ Features
 - Ball & paddle physics
 - Score tracking
