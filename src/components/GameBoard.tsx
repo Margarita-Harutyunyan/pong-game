@@ -1,22 +1,21 @@
-import React from 'react';
 import { useRef, useEffect } from 'react';
 import { CONFIG } from '../utils/consts';
 import { checkPaddleCollision } from '../utils/collision';
 
 export const GameBoard = () => {
-    const canvasRef = useRef(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    let ballPosition = useRef({x: 0, y: 0});
+    let ballPosition = useRef<{x: number, y: number}>({x: 0, y: 0});
     
-    let xSpeed = useRef(0);
-    let ySpeed = useRef(0);
+    let xSpeed = useRef<number>(0);
+    let ySpeed = useRef<number>(0);
 
-    let leftPaddleTop = useRef(10);
-    let rightPaddleTop = useRef(30);
+    let leftPaddleTop = useRef<number>(10);
+    let rightPaddleTop = useRef<number>(30);
 
-    let leftScore = useRef(0);
-    let rightScore = useRef(0);
-    let gameOver = useRef(false);
+    let leftScore = useRef<number>(0);
+    let rightScore = useRef<number>(0);
+    let gameOver = useRef<boolean>(false);
 
     const initBall = () => {
         ballPosition.current = {x: 20, y: 30};
@@ -24,17 +23,17 @@ export const GameBoard = () => {
         ySpeed.current = 2;
     };
 
-    const fillCanvas = (ctx) => {
+    const fillCanvas = (ctx:CanvasRenderingContext2D) => {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
     };
 
-    const drawBall = (ctx) => {
+    const drawBall = (ctx: CanvasRenderingContext2D) => {
         ctx.fillStyle = "white";
         ctx.fillRect(ballPosition.current.x, ballPosition.current.y, CONFIG.BALL_SIZE, CONFIG.BALL_SIZE);
     };
 
-    const drawPaddles = (ctx) => {
+    const drawPaddles = (ctx: CanvasRenderingContext2D) => {
         ctx.fillStyle = "white";
 
         // left paddle
@@ -44,7 +43,7 @@ export const GameBoard = () => {
         ctx.fillRect(CONFIG.WIDTH - CONFIG.PADDLE_OFFSET - CONFIG.PADDLE_WIDTH, rightPaddleTop.current, CONFIG.PADDLE_WIDTH, CONFIG.PADDLE_HEIGHT);
     };
 
-    const drawScores = (ctx) => {
+    const drawScores = (ctx: CanvasRenderingContext2D) => {
         ctx.font = "42px monospace";
         ctx.textAlign = "left";
         ctx.fillText(leftScore.current.toString(), CONFIG.WIDTH * 0.25, 80);
@@ -76,7 +75,7 @@ export const GameBoard = () => {
         followBall();
     };
 
-    const adjustAngle = (distanceFromTop, distanceFromBottom) => {
+    const adjustAngle = (distanceFromTop: number, distanceFromBottom: number) => {
         if (distanceFromTop < 0) {
             ySpeed.current -= 0.5;
         } else if (distanceFromBottom < 0) {
@@ -137,7 +136,7 @@ export const GameBoard = () => {
         }
     };
 
-    const draw = (ctx) => {
+    const draw = (ctx: CanvasRenderingContext2D) => {
         fillCanvas(ctx);
         drawBall(ctx);
         drawPaddles(ctx);
@@ -149,8 +148,9 @@ export const GameBoard = () => {
         checkCollision();
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         let position = e.clientY - canvas.getBoundingClientRect().top;
         if (position < 0) {
             position = 0;
@@ -161,7 +161,7 @@ export const GameBoard = () => {
         rightPaddleTop.current = position;
     };
 
-    const drawGameOver = (ctx) => {
+    const drawGameOver = (ctx: CanvasRenderingContext2D) => {
         ctx.fillStyle = "white";
         ctx.font = "42px monospace";
         ctx.textAlign = "center";
@@ -169,10 +169,10 @@ export const GameBoard = () => {
     }
 
     const gameLoop = () => {
-        console.log('drawing')
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-
+        if (!ctx) return;
         draw(ctx);
         update();
 
@@ -180,7 +180,7 @@ export const GameBoard = () => {
             drawGameOver(ctx); 
         } else {
             requestAnimationFrame(gameLoop);
-        }
+        } 
     };
 
     useEffect(() => {

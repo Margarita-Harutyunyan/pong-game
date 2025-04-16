@@ -1,10 +1,10 @@
 import './App.css';
 import GameBoard from './components/GameBoard';
 
-function App() {
+const App = () => {
   return (
     <GameBoard />
-  )
-}
+  );
+};
 
-export default App
+export default App;
